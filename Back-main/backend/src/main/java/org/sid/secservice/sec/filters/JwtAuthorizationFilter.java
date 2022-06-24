@@ -30,29 +30,35 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
 			filterChain.doFilter(request, response);
 		}
 		else {
-			String authorizationToken=request.getHeader(JWTUtil.AUTH_HEADER);
+		
+			String authorizationToken=request.getHeader("CreAuthorization");
+			System.out.println(authorizationToken);
+	
 			if(authorizationToken!=null && authorizationToken.startsWith(JWTUtil.PREFIX)) {
-				try {
+				//try {
 					String jwt=authorizationToken.substring(JWTUtil.PREFIX.length());
+					System.out.println(jwt);
 					Algorithm algorithm=Algorithm.HMAC256(JWTUtil.SECRET);
 					JWTVerifier jwtVerifier=JWT.require(algorithm).build();
 					DecodedJWT decodedJWT= jwtVerifier.verify(jwt);
 					String username=decodedJWT.getSubject();
+
 					String[] roles=decodedJWT.getClaim("roles").asArray(String.class);
 					Collection<GrantedAuthority> authorities=new ArrayList<>();
 					for (String r:roles) {
 						authorities.add(new SimpleGrantedAuthority(r));
 					}
+					
 					UsernamePasswordAuthenticationToken authenticationToken=new UsernamePasswordAuthenticationToken(username,null,authorities);
 					SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 					filterChain.doFilter(request, response);
-				}
-				catch (Exception e) {
+				//}
+				/* catch (Exception e) {
 					
 					response.setHeader("error-message",e.getMessage());
 					response.sendError(HttpServletResponse.SC_FORBIDDEN);
 					
-				}
+				} */
 			}
 			else {
 				filterChain.doFilter(request, response);

@@ -13,6 +13,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,14 +22,15 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data @NoArgsConstructor @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class AppUser {
 	
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotEmpty
+/* 	@NotEmpty
 	@Size(min = 2, message = "Le username doit avoir au moins deux caracteres")
-	private String username;
+	private String username; */
 	
 	@Column(name = "firstName", nullable = false)
 	@NotEmpty
@@ -40,14 +43,13 @@ public class AppUser {
 	private String lastName;
 	
 	@NotEmpty
-	@Email
+	@Email(message = "Email invalid")
 	private String email;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private String dateNaiss;
 	
 	@NotEmpty
-	@Size(min=9,max=9,message="L'INE doit avoir 9 caracteres")
 	private String ine;
 	
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -56,23 +58,28 @@ public class AppUser {
 	private String password;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
-	private Collection<AppRole> appRoles = new ArrayList<>();
+	private Collection<AppRole> appRole = new ArrayList<>();
 	
-	public AppUser() {}
 
-	public AppUser(String username, String firstName, String lastName, String email, String dateNaiss, String ine,
+	
+	/* public AppUser() {
+	}
+
+
+	public AppUser(String firstName, String lastName, String email, String dateNaiss, String ine,
 			String password, Collection<AppRole> appRoles) {
 		super();
-		this.username = username;
+		// this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.dateNaiss = dateNaiss;
 		this.ine = ine;
 		this.password = password;
-		this.appRoles = appRoles;
+		this.appRole = appRole;
 		
-	}
+	} */
+	
 
 	public Long getId() {
 		return id;
@@ -82,13 +89,13 @@ public class AppUser {
 		this.id = id;
 	}
 
-	public String getUsername() {
+	/* public String getUsername() {
 		return username;
 	}
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
+	} */
 
 	public String getFirstName() {
 		return firstName;
@@ -138,13 +145,14 @@ public class AppUser {
 		this.password = password;
 	}
 
-	public Collection<AppRole> getAppRoles() {
-		return appRoles;
+	public Collection<AppRole> getAppRole() {
+		return appRole;
 	}
 
-	public void setAppRoles(Collection<AppRole> appRoles) {
-		this.appRoles = appRoles;
+	public void setAppRole(Collection<AppRole> appRoles) {
+		this.appRole = appRoles;
 	}
 
-	
+  
+
 }

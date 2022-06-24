@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +15,11 @@ import javax.validation.Valid;
 import org.sid.secservice.sec.JWTUtil;
 import org.sid.secservice.sec.entities.AppRole;
 import org.sid.secservice.sec.entities.AppUser;
+import org.sid.secservice.sec.entities.Etudiant;
 import org.sid.secservice.sec.entities.Token;
+import org.sid.secservice.sec.repo.EtudiantRepository;
 import org.sid.secservice.sec.service.AccountService;
+import org.sid.secservice.sec.service.AccountServiceImpl;
 import org.sid.secservice.sec.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,14 +44,20 @@ import lombok.Data;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4201")
+
 public class AccountRestController {
 	
 	@Autowired
 	private AccountService accountService;
+	@Autowired
+
+	private AccountServiceImpl accountServiceImpl;
+
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
-
+	@Autowired
+	private EtudiantRepository etudiantRepository;
 	@Autowired
 	private UserDetailsServiceImpl userDetailsServiceImpl;
 	
@@ -59,34 +69,37 @@ public class AccountRestController {
 	@CrossOrigin(origins = "http://localhost:4201")
 	public AppUser saveUser(@Valid @RequestBody AppUser appUser) throws Exception {
 		String tempIne = appUser.getIne();
-		if(tempIne != null && !"".equals(tempIne)) {
+		String tempMail = appUser.getEmail();
+		AppUser userObj = null;
+
+		if(tempIne != null &&   !"".equals(tempIne)) {
 			AppUser userobj = accountService.fetchAppUserByIne(tempIne);
 			if(userobj != null) {
 				throw new Exception("L'INE "+tempIne+" existe, veillez entrer le bon INE !!!");
 			}
-		}
-		String tempMail = appUser.getEmail();
-		if(tempMail != null && !"".equals(tempMail)) {
-			AppUser userobj = accountService.fetchAppUserByEmail(tempMail);
+			userobj = accountService.fetchAppUserByEmail(tempMail);
 			if(userobj != null) {
 				throw new Exception("L'email "+tempMail+" existe, veillez entrer le bon mail !!!");
 			}
+			
+				if( etudiantRepository.findByIne(tempIne)==null) {
+					throw new Exception("L'Etudiant n est pas dans la base de données");
+				}
+				userObj = accountService.saveUser(appUser);
 		}
-
-		AppUser userObj = null;
-		userObj = accountService.saveUser(appUser);
 		return userObj;
 	}
+
 	@PostMapping(path = "/loginAuth")
-	@CrossOrigin(origins = "http://localhost:4201")
+ 	@CrossOrigin(origins = "http://localhost:4201") 
 	public Token loginUser(@RequestBody AppUser appUser, HttpServletRequest request) throws Exception{
 		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getUsername(), appUser.getPassword()));
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
 
 		} catch (BadCredentialsException e) {
-			throw new Exception("Incorrect username or password");
+			throw new Exception("Incorrect email or password");
 		}
-		final UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(appUser.getUsername());
+		final UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(appUser.getEmail());
 		Algorithm algo1 =Algorithm.HMAC256(JWTUtil.SECRET);
 		String jwtAccessToken= JWT.create()
 				.withSubject(userDetails.getUsername())
@@ -119,10 +132,10 @@ public class AccountRestController {
 				String username=decodedJWT.getSubject();
 				AppUser appUser =accountService.loadUserByUsername(username);
 				String jwtAccessToken= JWT.create()
-						.withSubject(appUser.getUsername())
+						.withSubject(appUser.getEmail())
 						.withExpiresAt(new Date(System.currentTimeMillis()+JWTUtil.EXPIRE_ACCESS_TOKEN))
 						.withIssuer(request.getRequestURL().toString())
-						.withClaim("roles", appUser.getAppRoles().stream().map(r->r.getRoleName()).collect(Collectors.toList()))
+						.withClaim("roles", appUser.getAppRole().stream().map(r->r.getRoleName()).collect(Collectors.toList()))
 						.sign(algorithm);
 				Map<String, String> idToken=new HashMap<>();
 				idToken.put("access-token", jwtAccessToken);
@@ -143,6 +156,12 @@ public class AccountRestController {
 	@GetMapping(path = "/profile")
 	public AppUser profile(Principal principal) {
 		return accountService.loadUserByUsername(principal.getName());
+	}
+
+	@GetMapping(path = "/userConnecter")
+	public Optional<AppUser> userConnecter() {
+		System.out.println("IN userConnecter");
+		return accountServiceImpl.getUserWithAuthorities();
 	}
 }
 @Data

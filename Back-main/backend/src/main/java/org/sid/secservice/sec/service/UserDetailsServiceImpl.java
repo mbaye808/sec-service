@@ -27,10 +27,10 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		AppUser appUser = accountService.loadUserByUsername(username);
 		Collection<GrantedAuthority> authorities=new ArrayList<>();
-		appUser.getAppRoles().forEach(r->{
+		appUser.getAppRole().forEach(r->{
 			authorities.add(new SimpleGrantedAuthority(r.getRoleName())); 
 		}); 
-		return new User(appUser.getUsername(), appUser.getPassword(), authorities);
+		return new User(appUser.getEmail(), appUser.getPassword(), authorities);
 	}
 
 }

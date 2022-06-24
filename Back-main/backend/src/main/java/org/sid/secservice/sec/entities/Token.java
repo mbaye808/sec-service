@@ -1,5 +1,8 @@
 package org.sid.secservice.sec.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Token {
     
     private String token;
