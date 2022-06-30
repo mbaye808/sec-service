@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.*;
 
 @Repository
 public interface NiveauRepository extends JpaRepository<Niveau, Long> {
+
 /* 	Niveau findByCodeNiveau(String codeNiveau);
 	Niveau findByCodeNiveauDisi(String codeNiveauDisi);
 	Niveau findByCodeNiveauDisiContaining(String codeNiveauDisi);

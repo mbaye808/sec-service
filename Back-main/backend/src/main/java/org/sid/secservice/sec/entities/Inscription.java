@@ -61,6 +61,9 @@ public class Inscription implements Serializable {
     @ManyToOne
     private Groupe groupe;
 
+    @ManyToOne
+    private Seance seance;
+
 
     @ManyToOne
     @NotNull
@@ -134,7 +137,17 @@ public class Inscription implements Serializable {
         this.groupe = groupe;
     }
 
+    
 
+
+
+    public Seance getSeance() {
+        return seance;
+    }
+
+    public void setSeance(Seance seance) {
+        this.seance = seance;
+    }
 
     public Etudiant getEtudiant() {
         return etudiant;

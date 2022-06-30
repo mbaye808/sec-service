@@ -24,7 +24,6 @@ public interface GroupeRepository extends JpaRepository<Groupe, Long> {
     List<Groupe> findByNiveau(Niveau niveau);
     Groupe findByCode(String code);
 
-
 /* 
     List<Groupe> findByNiveauOrderByCode(Niveau niveau);
 

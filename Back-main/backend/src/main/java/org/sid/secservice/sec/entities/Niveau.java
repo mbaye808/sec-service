@@ -31,6 +31,8 @@ public class Niveau implements Serializable{
     @Column(name = "libelle", nullable = false)
     private String libelle;
 
+
+
     @NotNull
     @Column(name = "terminal", nullable = false)
     private Boolean terminal;
@@ -97,6 +99,9 @@ public class Niveau implements Serializable{
     public void setLibelle(String libelle) {
         this.libelle = libelle;
     }
+
+    
+
 
     public Boolean isTerminal() {
         return terminal;
