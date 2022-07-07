@@ -153,6 +153,4 @@ public class AppUser {
 		this.appRole = appRoles;
 	}
 
-  
-
 }

@@ -56,9 +56,6 @@ public class SeanceResource {
     private final SeanceRepository seanceRepository;
 
     @Autowired
-    private NiveauRepository niveauRepository;
-
-    @Autowired
     private AccountServiceImpl accountServiceImpl;
 
     @Autowired
@@ -67,8 +64,6 @@ public class SeanceResource {
     @Autowired
     private InscriptionRepository inscriptionRepository;
  
-    @Autowired
-    private HistoriqueEnseignementRepository historiqueEnseignementRepository;
     @Autowired
     private MembreRepository membreRepository;
 

@@ -15,7 +15,6 @@ import javax.validation.Valid;
 import org.sid.secservice.sec.JWTUtil;
 import org.sid.secservice.sec.entities.AppRole;
 import org.sid.secservice.sec.entities.AppUser;
-import org.sid.secservice.sec.entities.Etudiant;
 import org.sid.secservice.sec.entities.Token;
 import org.sid.secservice.sec.repo.EtudiantRepository;
 import org.sid.secservice.sec.service.AccountService;
@@ -163,6 +162,8 @@ public class AccountRestController {
 		System.out.println("IN userConnecter");
 		return accountServiceImpl.getUserWithAuthorities();
 	}
+
+
 }
 @Data
 class RoleUserForm{
